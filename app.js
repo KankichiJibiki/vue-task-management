@@ -1,3 +1,5 @@
+
+// -- start db --
 class Task
 {
     constructor(title, section, content, index){
@@ -5,10 +7,22 @@ class Task
         this.section = section;
         this.content = content;
         this.index = index;
+        this.favorite = false;
+        this.done = false;
     }
 
     setSection(section){
         this.section = section;
+    }
+
+    toggleFavorite(){
+        if(this.favorite) this.favorite = false;
+        else this.favorite = true;
+    }
+
+    toggleDone(){
+        if(this.done) this.done = false;
+        else this.done = true;
     }
 }
 
@@ -40,22 +54,20 @@ class Section
         Section.counter++;
         return taskObj;
     }
-
-    // static remove(index, section){
-    //     console.log(Section.sectionLists[section], index);
-    //     console.log(Section.sectionLists);
-    //     Vue.delete(Section.sectionLists[section], index);
-    // }
 }
+
+// -- end db --
 
 let modal_template = {
     template: '#modal-template',
     data(){
         return {
             sectionLists: Section.sectionLists,
+
             registeredTitle: '',
             registeredSection: "Select a section",
             registeredContent: '',
+            registerBtn: true,
         }
     },
     props: {
@@ -74,6 +86,17 @@ let modal_template = {
         closeModal(){
             this.$emit('close')
         },
+    },
+    computed: {
+        toggleRegiBtn(){
+            if(this.registeredTitle.length > 0 && this.registeredSection != "Select a section" && this.registeredContent.length > 0) {
+                this.registerBtn = false;
+                return this.registerBtn;
+            }
+            
+            this.registerBtn = true;
+            return this.registerBtn;
+        }
     }
 }
 
@@ -82,6 +105,8 @@ let card_template = {
     data(){
         return{
             selectedSection: '',
+            favorite: '',
+            done: '',
             sectionLists: Section.sectionLists,
             allSections: Section.allSections,
         }
@@ -102,6 +127,14 @@ let card_template = {
         content: {
             required: true,
             type: String,
+        },
+        favorite: {
+            required: true,
+            type: Boolean,
+        },
+        done: {
+            required: true,
+            type: Boolean,
         },
     },
     methods: {
@@ -127,6 +160,22 @@ let card_template = {
             console.log('works');
             // Section.remove(index, section);
             this.$delete(Section.sectionLists[section], index);
+        },
+        toggleFavorite(){
+            this.$emit('toggleFavorite');
+        },
+
+        toggleDone(){
+            this.$emit('toggleDone');
+        }
+    },
+    computed: {
+        getFavorite(){
+            return this.favorite;
+        },
+
+        getDone(){
+            return this.done;
         }
     }
 };
@@ -196,8 +245,8 @@ var app = new Vue({
     },
     computed: {
         getAllLists(){
-            this.sectionList = Section.sectionLists;
+            this.sectionLists = Section.sectionLists;
             return Section.sectionLists;
         }
-    }
+    },
 });

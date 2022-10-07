@@ -18,9 +18,9 @@
 
 <body>
   <!-- -- main -- -->
-  <main id="app" class="container-fluid bg-dark vh-100">
+  <main id="app" class="container-fluid bg-dark">
     <div class="d-flex justify-content-center align-items-center flex-column">
-      <div class="col-3">
+      <div class="col-3 my-4">
         <button type="button" class="btn btn-outline-light text-uppercase my-3 w-100" @click="toggleSectionInput()">add section</button>
         <div class="input-group" v-if="section_disabled">
           <input type="text" name="section_name" id="section_name" class="form-control" placeholder="Put a section here" v-model="section_name">
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="container bg-light p-3 col-md-11 col-12 my-3 d-flex flex-wrap justify-content-end" v-if="sectionCount > 0">
+      <div class="container bg-light p-3 col-md-11 col-12 my-3 d-flex flex-wrap justify-content-center" v-if="sectionCount > 0">
         <section_template v-for="(sec, index) in getAllLists" :section="index" :sec_obj="sec" :key="index">
         </section_template>
       </div>
@@ -55,7 +55,7 @@
         <textarea cols="10" rows="5" class="form-control" v-model="registeredContent"></textarea>
       </div>
       <div class="mb-3">
-        <button type="button" class="btn btn-outline-primary" @click="addTask()">Register</button>
+        <button type="button" :disabled="toggleRegiBtn" class="btn btn-outline-primary" @click="addTask()">Register</button>
       </div>
     </div>
     
@@ -66,7 +66,18 @@
       <div class="d-flex flex-column">
         <!-- <div class="card card-title p-2">{{ section }}</div> -->
         <input type="text" class="form-control mb-3" :value="section" disabled >
-        <card_template v-if="sec_obj != null" v-for="(task, index) in sec_obj" :key="getSection(section) + index" :title="task.title" :section="task.section" :content="task.content" :index="task.index" @toSection_name="emitSection"></card_template>
+        <card_template v-if="sec_obj != null" v-for="(task, index) in sec_obj" 
+        :key="getSection(section) + index" 
+        :title="task.title" 
+        :section="task.section" 
+        :content="task.content" 
+        :index="task.index" 
+        :favorite="task.favorite" 
+        :done="task.done" 
+        @toSection_name="emitSection"
+        @toggleFavorite="task.toggleFavorite()"
+        @toggleDone="task.toggleDone()">
+        </card_template>
       </div>
 
       <!-- modal -->
@@ -83,8 +94,7 @@
       <fieldset>
         <legend>section</legend>
         <select lass="form-select" v-model="selectedSection" @change="updateSection(index, section)">
-          <option :selected="select(section)">{{ selectedSection }}</option>
-          <option v-for="sec in allSections">{{ sec }}</option>
+          <option v-for="sec in allSections" :disabled="select(section)">{{ sec }}</option>
         </select>
       </fieldset>
       
@@ -94,12 +104,11 @@
         <button type="button" class="btn border-0" @click="removeTask(index, section)">
           <i class="fa-solid fa-trash"></i>
         </button>
-
         <button type="button" class="btn border-0">
-          <i class="fa-solid fa-check"></i>
+          <i class="fa-solid fa-check" :class="{ 'text-success': getDone }" @click="toggleDone()"></i>
         </button>
         <button type="button" class="btn border-0">
-          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star" :class="{ 'text-warning': getFavorite}" @click="toggleFavorite()"></i>
         </button>
       </div>
     </div>
