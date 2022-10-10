@@ -154,6 +154,9 @@ let card_template = {
         }
     },
     props: {
+        task: {
+            required: true,
+        },
         index: {
             required: true,
             type: Number,
@@ -203,21 +206,25 @@ let card_template = {
             // Section.remove(index, section);
             this.$delete(Section.sectionLists[section], index);
         },
-        toggleFavorite(){
-            this.$emit('toggleFavorite');
+        toggleFavorite(task){
+            task.favorite = task.favorite ? false : true;
+            this.isFavorite = task.favorite;
+            console.log(task);
         },
 
-        toggleDone(){
-            this.$emit('toggleDone');
+        toggleDone(task){
+            task.done = task.done ? false : true;
+            this.isDone = task.done;
+            console.log(task);
         }
     },
     computed: {
         getFavorite(){
-            return this.favorite;
+            return this.isFavorite;
         },
 
         getDone(){
-            return this.done;
+            return this.isDone;
         }
     }
 };

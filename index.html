@@ -92,16 +92,15 @@
         </div>
         
         <card_template v-if="sec_obj != null" v-for="(task, index) in sec_obj" 
-        :key="getSection(section) + index" 
+        :key="getSection(section) + index"
+        :task= "task"
         :title="task.title" 
         :section="task.section" 
         :content="task.content" 
         :index="task.index" 
         :favorite="task.favorite" 
         :done="task.done" 
-        @toSection_name="emitSection"
-        @toggleFavorite="task.toggleFavorite()"
-        @toggleDone="task.toggleDone()">
+        @toSection_name="emitSection">
         </card_template>
       </div>
 
@@ -130,10 +129,10 @@
           <i class="fa-solid fa-trash"></i>
         </button>
         <button type="button" class="btn border-0">
-          <i class="fa-solid fa-check" :class="{ 'text-success': getDone }" @click="toggleDone()"></i>
+          <i class="fa-solid fa-check" :class="{ 'text-success': getDone }" @click="toggleDone(task)"></i>
         </button>
         <button type="button" class="btn border-0">
-          <i class="fa-solid fa-star" :class="{ 'text-warning': getFavorite}" @click="toggleFavorite()"></i>
+          <i class="fa-solid fa-star" :class="{ 'text-warning': getFavorite}" @click="toggleFavorite(task)"></i>
         </button>
       </div>
     </div>
