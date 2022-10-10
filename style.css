@@ -2,3 +2,8 @@
     --card-size: 5rem;
 }
 
+#saveDataSec{
+    position: absolute;
+    left: 5.5rem;
+    top: 2.5rem;
+}

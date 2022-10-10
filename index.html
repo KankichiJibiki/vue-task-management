@@ -14,6 +14,8 @@
   <!-- fontawesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+  <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -21,12 +23,29 @@
   <main id="app" class="container-fluid bg-dark">
     <div class="d-flex justify-content-center align-items-center flex-column">
       <div class="col-3 my-4">
-        <button type="button" class="btn btn-outline-light text-uppercase my-3 w-100" @click="toggleSectionInput()">add section</button>
+        <button type="button" class="btn btn-outline-light text-uppercase my-3 w-100" @click="toggleSectionInput()">
+          add section
+        </button>
         <div class="input-group" v-if="section_disabled">
           <input type="text" name="section_name" id="section_name" class="form-control" placeholder="Put a section here" v-model="section_name">
           <button button="submit" class="btn btn-success input-group-btn" v-if="section_name.length > 0" @click="addSection()">
             <i class="fa-solid fa-plus"></i>
           </button>
+        </div>
+
+        <div class="col-2" class="saveDataSec" id="saveDataSec">
+          <input type="text" class="form-control" placeholder="Hit the save name" v-model="saveDataInput">
+          <div class="d-flex justify-content-around">
+            <button :disabled="saveDataInput.length == 0" @click="saveData()">
+              <i class="fa-solid fa-floppy-disk"></i>
+            </button>
+            <button @click="removeData()">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+            <button :disabled="saveDataInput.length == 0" @click="getSaveData()">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -64,8 +83,14 @@
   <script type="text/x-template" id="section-list-template">
     <div class="col-12 col-md-3 mb-3 me-1">
       <div class="d-flex flex-column">
-        <!-- <div class="card card-title p-2">{{ section }}</div> -->
-        <input type="text" class="form-control mb-3" :value="section" disabled >
+        
+        <div class="mb-3 input-group">
+          <input type="text" class="form-control" v-model="section_name" :disabled="disableInput(section)" @hover="toggleSection()">
+          <div class="input-group-btn" v-if="updateBtn">
+            <button class="btn btn-primary border-0" @click="updateSectionName()">OK</button>
+          </div>
+        </div>
+        
         <card_template v-if="sec_obj != null" v-for="(task, index) in sec_obj" 
         :key="getSection(section) + index" 
         :title="task.title" 

@@ -54,6 +54,48 @@ class Section
         Section.counter++;
         return taskObj;
     }
+
+    static overrideData(sectionLists, allSections){
+        Section.sectionLists = sectionLists;
+        Section.allSections = allSections;
+    }
+}
+
+class Controller{
+    static getSaveData(saveName){
+        if(localStorage.getItem(saveName)){
+            let saveObj = JSON.parse(localStorage.getItem(saveName));
+            let sectionLists = saveObj.sectionLists;
+            let allSections = saveObj.allSections;
+            Section.overrideData(sectionLists, allSections);
+            console.log(Section.sectionLists);
+            console.log(Section.allSections);
+            alert('We successfully retrieve your data');
+            return saveObj;
+        } else {
+            alert('We dont have such a data');
+            return;
+        }
+    }
+
+    static saveData(saveName){
+        let saveData = {
+            "sectionLists": Section.sectionLists,
+            "allSections": Section.allSections,
+        }
+        let jsonEncodedSave = JSON.stringify(saveData);
+        localStorage.setItem(saveName, jsonEncodedSave);
+        alert('We successfully saved your data');
+    }
+
+    static resetData(saveName){
+        let yesorno = confirm('Are you sure?')
+
+        if(yesorno){
+            localStorage.removeItem(saveName);
+            alert('Data is reset now');
+        }
+    }
 }
 
 // -- end db --
@@ -105,8 +147,8 @@ let card_template = {
     data(){
         return{
             selectedSection: '',
-            favorite: '',
-            done: '',
+            isFavorite: '',
+            isDone: '',
             sectionLists: Section.sectionLists,
             allSections: Section.allSections,
         }
@@ -201,6 +243,8 @@ let section_template = {
         return {
             showModal: false,
             section_name: '',
+            isInputDisabled: true, 
+            updateBtn: false, 
         }
     },
     methods: {
@@ -214,6 +258,15 @@ let section_template = {
         },
         emitSection(currsec){
             this.section_name = currsec;
+        },
+        disableInput(section){
+            this.section_name = section;
+            this.isInputDisabled = true;
+            return this.isInputDisabled;
+        },
+        toggleSection(){
+            if(this.isInputDisabled) this.isInputDisabled = false;
+            else this.isInputDisabled = true;
         }
     }
 };
@@ -221,15 +274,21 @@ let section_template = {
 var app = new Vue({
     el: '#app',
     data: {
-        section_disabled: false,
         section_name: '',
         sectionLists: '',
         sectionCount: 0,
+        section_disabled: false,
+        saveDataInput: '',
     },
     components: {
         section_template: section_template,
     },
     methods: {
+        addSection(){
+            Section.createSection(this.section_name);
+            this.section_name = '';
+            this.sectionCount++;
+        },
         toggleSectionInput(){
             if(this.section_disabled){
                 this.section_disabled = false;
@@ -237,16 +296,26 @@ var app = new Vue({
                 this.section_disabled = true;
             }
         },
-        addSection(){
-            Section.createSection(this.section_name);
-            this.section_name = '';
-            this.sectionCount++;
+        saveData(){
+            Controller.saveData(this.saveDataInput);
         },
+        getSaveData(){
+            let saveData = Controller.getSaveData(this.saveDataInput);
+            let count = saveData.allSections.length;
+            this.sectionCount = count;
+            this.sectionLists = saveData.sectionLists;
+        },
+        removeData(){
+            Controller.resetData(this.saveDataInput);
+            this.sectionLists = Section.sectionLists;
+            this.sectionCount = 0;
+            this.saveDataInput = '';
+        }
     },
     computed: {
         getAllLists(){
             this.sectionLists = Section.sectionLists;
             return Section.sectionLists;
-        }
+        },
     },
 });
